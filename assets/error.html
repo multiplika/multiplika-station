@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="fonts.css" />
+  <title>Sin conexión</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f5f6f8;
+      color: #1f2937;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .card {
+      text-align: center;
+      max-width: 420px;
+      padding: 40px 32px;
+    }
+    .icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 24px;
+      border-radius: 50%;
+      background: #fee2e2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon svg { width: 32px; height: 32px; stroke: #dc2626; }
+    h1 { font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; margin: 0 0 8px; }
+    p { font-size: 14px; color: #6b7280; line-height: 1.5; margin: 0 0 24px; }
+    .detail { font-size: 12px; color: #9ca3af; margin-top: 16px; word-break: break-all; }
+    button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 28px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    button:hover { background: #1d4ed8; }
+    button:active { background: #1e40af; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 1l22 22" />
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
+        <path d="M10.71 5.05A16 16 0 0 1 22.58 9" />
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+        <line x1="12" y1="20" x2="12.01" y2="20" />
+      </svg>
+    </div>
+    <h1>No se pudo conectar</h1>
+    <p>Comprueba tu conexión a internet e inténtalo de nuevo.</p>
+    <button id="retry">Reintentar</button>
+    <div class="detail" id="detail"></div>
+  </div>
+
+  <script>
+    // Mostrar detalle técnico opcional pasado por query string.
+    const params = new URLSearchParams(window.location.search);
+    const desc = params.get('desc');
+    const code = params.get('code');
+    if (desc) {
+      document.getElementById('detail').textContent = desc + (code ? ' (' + code + ')' : '');
+    }
+
+    document.getElementById('retry').addEventListener('click', () => {
+      // Pedir al proceso principal que recargue la URL de la app.
+      if (window.appBridge && window.appBridge.retry) {
+        window.appBridge.retry();
+      }
+    });
+  </script>
+</body>
+</html>

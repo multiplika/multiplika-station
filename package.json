@@ -1,0 +1,82 @@
+{
+  "name": "multiplika-webview",
+  "version": "1.0.3",
+  "description": "Webview multiplataforma (Mac, Windows, Linux) que carga una única URL.",
+  "main": "main.js",
+  "author": "Multiplika",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "electron .",
+    "version:set": "node scripts/bump-version.js",
+    "dist": "electron-builder",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win",
+    "dist:linux": "electron-builder --linux",
+    "publish:win": "electron-builder --win --publish always"
+  },
+  "dependencies": {
+    "selfsigned": "^2.4.1",
+    "ssh2-sftp-client": "^11.0.0",
+    "electron-updater": "^6.3.9"
+  },
+  "devDependencies": {
+    "electron": "^43.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "net.multiplika.apiadev",
+    "productName": "Multiplika",
+    "copyright": "Copyright © Multiplika",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "preload-settings.js",
+      "preload-dashboard.js",
+      "config.js",
+      "settings-store.js",
+      "credentials-store.js",
+      "version.json",
+      "shell/**/*",
+      "assets/**/*",
+      "station/**/*"
+    ],
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.productivity",
+      "identity": "Multiplika Code Signing",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "multiplika",
+      "repo": "multiplika-station",
+      "releaseType": "release"
+    }
+  }
+}

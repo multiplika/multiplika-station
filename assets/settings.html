@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="fonts.css" />
+  <title>Configuración</title>
+  <style>
+    :root {
+      --bg: #fafbfc;
+      --card: #ffffff;
+      --text: #1a1c1e;
+      --muted: #6a7078;
+      --accent: #2563eb;
+      --accent-press: #1d4ed8;
+      --accent-soft: rgba(37,99,235,0.10);
+      --border: rgba(0,0,0,0.08);
+      --field: #ffffff;
+      --field-border: rgba(0,0,0,0.14);
+      --shadow: 0 1px 4px rgba(0,0,0,0.10);
+      --hover: rgba(0,0,0,0.05);
+      --ok: #157347;
+      --err: #b02a37;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1f2023;
+        --card: #26282c;
+        --text: #f5f6f7;
+        --muted: #9aa0a6;
+        --accent: #6ea0ff;
+        --accent-press: #4f86ee;
+        --accent-soft: rgba(110,160,255,0.15);
+        --border: rgba(255,255,255,0.09);
+        --field: #1c1d20;
+        --field-border: rgba(255,255,255,0.14);
+        --shadow: 0 1px 4px rgba(0,0,0,0.45);
+        --hover: rgba(255,255,255,0.06);
+        --ok: #4ade80;
+        --err: #f87171;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .layout { display: flex; justify-content: center; height: 100%; }
+
+    /* ---- Menú lateral ---- */
+    .sidebar {
+      flex: 0 0 200px;
+      min-width: 0;
+      background: var(--bg);
+      padding: 22px 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .side-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 8px 14px;
+    }
+    .side-head .badge {
+      width: 34px; height: 34px; flex: 0 0 auto;
+      border-radius: 9px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .side-head .badge svg { width: 19px; height: 19px; }
+    .side-head h1 { font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 15px; margin: 0; letter-spacing: 0.2px; }
+
+    .nav-item {
+      display: block;
+      padding: 9px 12px;
+      border-radius: 9px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.14s ease, color 0.14s ease;
+    }
+    .nav-item:hover { background: var(--hover); color: var(--text); }
+    .nav-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+    /* ---- Contenido con scroll ---- */
+    .content {
+      flex: 0 1 auto;
+      width: 676px;
+      max-width: 100%;
+      min-width: 0;
+      position: relative;
+      overflow-y: auto;
+      padding: 28px 28px 20px;
+    }
+    .content-inner { max-width: 620px; margin: 0; }
+
+    .section { scroll-margin-top: 12px; margin-bottom: 22px; }
+    .section > h2 {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 16px; font-weight: 600; margin: 0 0 12px;
+      letter-spacing: 0.2px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 4px 20px;
+    }
+
+    .row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 14px 0; border-top: 1px solid var(--border);
+    }
+    .card > .row:first-child { border-top: none; }
+    .row .label { font-size: 14px; }
+    .row .label small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+    input[type="text"], input[type="number"] {
+      font: inherit; font-size: 13px; color: var(--text);
+      background: var(--field); border: 1px solid var(--field-border);
+      border-radius: 8px; padding: 7px 10px;
+      -webkit-user-select: text; user-select: text;
+    }
+    input[type="text"] { width: 250px; max-width: 46vw; }
+    input[type="number"] { width: 88px; text-align: right; }
+    input:focus, select:focus { outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); outline-offset: 1px; }
+
+    select {
+      font: inherit; font-size: 13px; color: var(--text);
+      background: var(--field); border: 1px solid var(--field-border);
+      border-radius: 8px; padding: 7px 10px;
+      width: 250px; max-width: 46vw; cursor: pointer;
+    }
+
+    .empty { font-size: 13px; color: var(--muted); }
+
+    /* Interruptor */
+    .switch { position: relative; width: 40px; height: 23px; flex: 0 0 auto; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .track {
+      position: absolute; inset: 0; border-radius: 999px;
+      background: var(--field-border); transition: background 0.16s ease; cursor: pointer;
+    }
+    .track::before {
+      content: ""; position: absolute; width: 17px; height: 17px; left: 3px; top: 3px;
+      border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      transition: transform 0.16s ease;
+    }
+    .switch input:checked + .track { background: var(--accent); }
+    .switch input:checked + .track::before { transform: translateX(17px); }
+
+    .pair { display: flex; align-items: center; gap: 10px; }
+    .pair .x { color: var(--muted); font-size: 13px; }
+    .restart { font-size: 12px; color: var(--muted); margin: 8px 2px 0; }
+
+    /* Barra de acciones (fija abajo del contenido) */
+    .actions {
+      position: sticky; bottom: 0;
+      display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+      padding: 14px 0 4px; margin-top: 6px;
+      background: linear-gradient(to top, var(--bg) 72%, transparent);
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font: inherit; font-size: 13px; font-weight: 600;
+      border-radius: 9px; padding: 9px 18px; cursor: pointer;
+      border: 1px solid var(--accent); background: var(--accent); color: #fff;
+      transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+    }
+    .btn:hover { background: var(--accent-press); border-color: var(--accent-press); }
+    .btn:disabled { opacity: 0.6; cursor: default; }
+    .btn svg { width: 16px; height: 16px; }
+    .status { font-size: 13px; opacity: 0; transition: opacity 0.15s ease; }
+    .status.show { opacity: 1; }
+    .status.ok { color: var(--ok); }
+    .status.err { color: var(--err); }
+
+    /* ---- Botón fantasma ---- */
+    .btn.ghost { background: transparent; color: var(--text); border-color: var(--field-border); }
+    .btn.ghost:hover { background: var(--hover); border-color: var(--field-border); }
+
+    /* ---- Botones de soporte, suaves (tinta de color en vez de relleno sólido) ---- */
+    .btn.btn-soft {
+      border-radius: 999px; font-weight: 500; padding: 8px 15px;
+      background: var(--accent-soft); border-color: transparent; color: var(--accent);
+    }
+    .btn.btn-soft:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); border-color: transparent; }
+    .btn.btn-whatsapp {
+      border-radius: 999px; font-weight: 500; padding: 8px 15px;
+      background: color-mix(in srgb, #25d366 14%, transparent); border-color: transparent; color: #1a8f4c;
+    }
+    .btn.btn-whatsapp:hover { background: color-mix(in srgb, #25d366 24%, transparent); border-color: transparent; }
+    .btn .wa-logo { width: 17px; height: 17px; }
+    /* Los tres botones de Soporte, al mismo ancho y con el contenido centrado. */
+    .btn.btn-soft, .btn.btn-whatsapp { min-width: 172px; justify-content: center; }
+    @media (prefers-color-scheme: dark) { .btn.btn-whatsapp { color: #4ade80; } }
+
+    /* ---- Lista de apps (sección Aplicaciones) ---- */
+    .app-row {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; padding: 12px 4px;
+      border-top: 1px solid var(--border);
+    }
+    .card > .app-row:first-child { border-top: none; }
+    .app-row-icon { width: 30px; height: 30px; object-fit: contain; flex: 0 0 auto; }
+    .app-row-name { flex: 1 1 auto; font-size: 14px; }
+    .app-row-cfg {
+      flex: 0 0 auto; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      border: none; background: transparent; color: var(--muted);
+      border-radius: 8px; cursor: pointer;
+    }
+    .app-row-cfg:hover { background: var(--hover); color: var(--text); }
+    .app-row-cfg svg { width: 17px; height: 17px; }
+
+    /* ---- Modal de configuración de app ---- */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.35); padding: 24px; z-index: 50;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      width: 100%; max-width: 460px; max-height: 84vh; overflow-y: auto;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.28); padding: 22px;
+    }
+    .modal-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .modal-icon { width: 32px; height: 32px; object-fit: contain; }
+    .modal-head h3 {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 16px; font-weight: 600; margin: 0;
+    }
+    .modal-field { display: block; margin-bottom: 18px; }
+    .modal-field > span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .modal-field input {
+      width: 100%; font: inherit; font-size: 13px; color: var(--text);
+      background: var(--field); border: 1px solid var(--field-border);
+      border-radius: 8px; padding: 8px 11px; -webkit-user-select: text; user-select: text;
+    }
+    .modal-field input:focus { outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); outline-offset: 1px; }
+    /* URL de app: solo lectura salvo al pulsar "Editar". */
+    .modal-field input[readonly] { background: var(--hover); border-color: var(--border); color: var(--muted); cursor: default; }
+    .modal-field input[readonly]:focus { outline: none; }
+    .modal-field .url-row { display: flex; gap: 8px; align-items: center; }
+    .modal-field .url-row input { flex: 1 1 auto; min-width: 0; width: auto; }
+    .modal .btn.btn-sm { padding: 7px 12px; font-size: 12px; white-space: nowrap; }
+
+    .creds-head { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin-bottom: 8px; }
+    .creds-list { display: flex; flex-direction: column; gap: 6px; }
+    .cred {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 11px; border: 1px solid var(--border); border-radius: 9px;
+    }
+    .cred-user { font-size: 13px; font-weight: 500; max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cred-pass { flex: 1 1 auto; font-size: 13px; color: var(--muted); letter-spacing: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cred-btn {
+      flex: 0 0 auto; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+      border: none; background: transparent; color: var(--muted); border-radius: 7px; cursor: pointer;
+    }
+    .cred-btn:hover { background: var(--hover); color: var(--text); }
+    .cred-btn svg { width: 15px; height: 15px; }
+    .creds-empty { font-size: 13px; color: var(--muted); padding: 6px 2px; }
+
+    .creds-add { display: flex; gap: 8px; margin-top: 10px; }
+    .creds-add input {
+      flex: 1 1 auto; min-width: 0;
+      font: inherit; font-size: 13px; color: var(--text);
+      background: var(--field); border: 1px solid var(--field-border);
+      border-radius: 8px; padding: 8px 10px; -webkit-user-select: text; user-select: text;
+    }
+    .creds-add input:focus { outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); outline-offset: 1px; }
+    .creds-add .btn { flex: 0 0 auto; }
+    .creds-note { font-size: 12px; line-height: 1.45; margin-top: 12px; padding: 8px 10px; border-radius: 8px; }
+    .creds-note.secure { color: #15803d; background: color-mix(in srgb, #16a34a 12%, transparent); }
+    .creds-note.insecure { color: #b45309; background: color-mix(in srgb, #f59e0b 16%, transparent); }
+
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+    .modal .btn {
+      font: inherit; font-size: 13px; font-weight: 600;
+      border-radius: 9px; padding: 9px 16px; cursor: pointer;
+      border: 1px solid var(--accent); background: var(--accent); color: #fff;
+    }
+    .modal .btn.ghost { background: transparent; color: var(--text); border-color: var(--border); }
+    .modal .btn.ghost:hover { background: var(--hover); }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-head">
+        <span class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </span>
+        <h1>Configuración</h1>
+      </div>
+      <a class="nav-item" data-target="sec-actualizaciones">Actualizaciones</a>
+      <a class="nav-item" data-target="sec-soporte">Soporte</a>
+      <a class="nav-item" data-target="sec-general">General</a>
+      <a class="nav-item" data-target="sec-aplicaciones">Aplicaciones</a>
+      <a class="nav-item" data-target="sec-ventana">Ventana</a>
+      <a class="nav-item" data-target="sec-impresoras">Impresoras</a>
+    </aside>
+
+    <main class="content" id="content">
+      <div class="content-inner">
+        <section class="section" id="sec-actualizaciones">
+          <h2>Actualizaciones</h2>
+          <div class="card">
+            <div class="row">
+              <span class="label">Versión actual<small>Multiplika Station</small></span>
+              <span class="label" id="versionValue">—</span>
+            </div>
+            <div class="row">
+              <span class="label">Última actualización</span>
+              <span class="label" id="versionDate">—</span>
+            </div>
+            <div class="row">
+              <span class="label">Actualización automática<small id="updMsg">Se instala sola al cerrar la aplicación.</small></span>
+              <div class="pair">
+                <button class="btn ghost" id="updCheckBtn">Buscar</button>
+                <button class="btn" id="updInstallBtn" style="display:none">Instalar y reiniciar</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec-soporte">
+          <h2>Soporte</h2>
+          <div class="card">
+            <div class="row">
+              <span class="label">Correo de soporte<small>soporte@multiplika.es</small></span>
+              <button class="btn btn-soft" id="emailBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                Escribir correo
+              </button>
+            </div>
+            <div class="row">
+              <span class="label">WhatsApp<small>95 531 20 20</small></span>
+              <button class="btn btn-whatsapp" id="whatsappBtn">
+                <svg class="wa-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 018.413 3.488 11.82 11.82 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.737-.979zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.074-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
+                Abrir WhatsApp
+              </button>
+            </div>
+            <div class="row">
+              <span class="label">Acceso remoto<small>Descarga RustDesk para que soporte pueda conectarse a tu equipo.</small></span>
+              <button class="btn btn-soft" id="rustdeskBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+                Descargar
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec-general">
+          <h2>General</h2>
+          <div class="card">
+            <div class="row">
+              <span class="empty">No hay opciones en esta sección todavía.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec-aplicaciones">
+          <h2>Aplicaciones</h2>
+          <p class="restart" style="margin:0 2px 10px">El interruptor decide si la aplicación aparece en el Panel de control. El engranaje abre su configuración (URL y contraseñas).</p>
+          <div class="card">
+            <div class="app-row">
+              <img class="app-row-icon" src="app-erp.png" alt="" />
+              <span class="app-row-name">multiplika ERP</span>
+              <label class="switch" title="Mostrar en el Panel de control"><input type="checkbox" id="SHOW_ERP" /><span class="track"></span></label>
+              <button class="app-row-cfg" data-app="erp" title="Configurar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </button>
+            </div>
+            <div class="app-row">
+              <img class="app-row-icon" src="app-plus.png" alt="" />
+              <span class="app-row-name">multiplika Plus</span>
+              <label class="switch" title="Mostrar en el Panel de control"><input type="checkbox" id="SHOW_PLUS" /><span class="track"></span></label>
+              <button class="app-row-cfg" data-app="plus" title="Configurar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </button>
+            </div>
+            <div class="app-row">
+              <img class="app-row-icon" src="app-leia.png" alt="" />
+              <span class="app-row-name">multiplika Leia</span>
+              <label class="switch" title="Mostrar en el Panel de control"><input type="checkbox" id="SHOW_LEIA" /><span class="track"></span></label>
+              <button class="app-row-cfg" data-app="leia" title="Configurar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec-ventana">
+          <h2>Ventana</h2>
+          <div class="card">
+            <div class="row">
+              <span class="label">Pantalla completa por defecto<small>Iniciar la aplicación a pantalla completa.</small></span>
+              <label class="switch"><input type="checkbox" id="FULLSCREEN" /><span class="track"></span></label>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec-impresoras">
+          <h2>Impresoras</h2>
+          <div class="card">
+            <div class="row">
+              <span class="label">Impresora de documentos<small>Se usará para imprimir documentos.</small></span>
+              <select id="PRINTER_DOCUMENTS"></select>
+            </div>
+            <div class="row">
+              <span class="label">Impresora de tickets<small>Se usará para imprimir tickets.</small></span>
+              <select id="PRINTER_TICKETS"></select>
+            </div>
+          </div>
+        </section>
+
+        <div class="actions">
+          <span class="status" id="status"></span>
+          <button class="btn" id="saveBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Guardar
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Diálogo de configuración de una app: URL + credenciales guardadas. -->
+  <div class="modal-backdrop" id="appModal">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <img id="appModalIcon" class="modal-icon" alt="" />
+        <h3 id="appModalTitle">Aplicación</h3>
+      </div>
+
+      <div class="modal-field">
+        <span>URL configurada</span>
+        <div class="url-row">
+          <input type="text" id="appModalUrl" class="readonly" readonly spellcheck="false" placeholder="Sin URL configurada" />
+          <button type="button" class="btn ghost btn-sm" id="urlEditBtn">Editar</button>
+        </div>
+      </div>
+
+      <div class="creds-head">Contraseñas guardadas</div>
+      <div class="creds-list" id="credsList"></div>
+
+      <div class="creds-add">
+        <input type="text" id="credAddUser" placeholder="Usuario" spellcheck="false" autocomplete="off" />
+        <input type="password" id="credAddPass" placeholder="Contraseña" autocomplete="off" />
+        <button class="btn" id="credAddBtn">Añadir</button>
+      </div>
+
+      <div class="creds-note" id="credsNote" hidden></div>
+
+      <div class="modal-actions">
+        <button class="btn ghost" id="appModalClose">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>

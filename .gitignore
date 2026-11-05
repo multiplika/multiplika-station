@@ -1,0 +1,19 @@
+# Dependencias
+node_modules/
+
+# Salida de compilación (instaladores, win-unpacked, latest.yml, blockmaps…)
+dist/
+
+# Configuración local de herramientas
+.claude/
+
+# Logs y temporales
+*.log
+npm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Auditoría de seguridad: no publicar en el repo público
+docs/04-auditoria-seguridad.md
