@@ -24,8 +24,17 @@ function die(m) { console.error('ERROR: ' + m); process.exit(1); }
 const version = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).version;
 const tag = 'v' + version;
 
-if (!fs.existsSync(path.join(dist, 'latest.yml'))) {
+const latestPath = path.join(dist, 'latest.yml');
+if (!fs.existsSync(latestPath)) {
   die('falta dist/latest.yml (¿compilaste con electron-builder --win?).');
+}
+// Salvaguarda: el latest.yml tiene que ser de ESTA versión (electron-builder a veces
+// deja uno obsoleto si falla). Si no coincide, abortar para no publicar un manifiesto
+// que apunte a otra versión (rompería la autoactualización).
+const ymlMatch = fs.readFileSync(latestPath, 'utf8').match(/^version:\s*(.+)$/m);
+const ymlVersion = ymlMatch ? ymlMatch[1].trim() : null;
+if (ymlVersion !== version) {
+  die('dist/latest.yml es de la versión ' + ymlVersion + ', no ' + version + '. Recompila (npm run dist:win) antes de subir.');
 }
 let exes = fs.readdirSync(dist).filter((f) => /\.exe$/i.test(f));
 if (!exes.length) die('no hay instalador .exe en ' + dist);
