@@ -21,23 +21,34 @@ de Multiplika Support.
   electron-builder lo hornea en `app-update.yml` dentro del instalador, y
   electron-updater consulta las releases de ese repo para saber si hay versión nueva.
 
-## Publicar una versión nueva
+## Versionado y publicación
+
+Las versiones van **por fecha**: `AAAA.MMDD.HHmm` (p. ej. `2026.1105.2015` = 2026-11-05
+20:15), así se sabe de un vistazo **cuándo se generó** la actualización. Llevan puntos
+porque electron-updater/electron-builder exigen **semver** (tres números) para comparar
+versiones; un número plano `AAAAMMDDHHmm` no serviría para decidir si hay que actualizar.
+Los componentes son enteros (`mes*100+día` y `hora*100+min`) para que sea semver válido
+y crezca en orden cronológico. `version.json.date` guarda además la marca legible
+`AAAAMMDD HH:MM`.
+
+Para publicar (no hay que inventar número: se sella la fecha/hora actual):
 
 ```bash
-npm run version:set -- 1.0.5     # sube version.json y package.json (semver)
+npm install                      # solo la 1.ª vez (electron-updater)
 set GH_TOKEN=<token>             # token con permiso 'repo' sobre multiplika/multiplika-station
-npm run publish:win              # crea/empuja el tag vX.Y.Z y publica con electron-builder
+npm run publish:win
 ```
 
-`publish:win` ejecuta primero `scripts/tag-release.js` (crea y empuja el tag
-`vX.Y.Z`, y aborta si esa versión ya estaba publicada) y luego
-`electron-builder --win --publish always`, que compila el instalador NSIS y **sube**
-a una GitHub Release el `.exe` + su `.blockmap` + `latest.yml`.
+`publish:win` encadena:
+1. `scripts/release.js` → genera la versión por fecha (`bump-version.js auto`),
+   commitea y empuja `version.json` + `package.json`, y crea y empuja el tag
+   `v<versión>` (aborta si esa versión ya se publicó).
+2. `electron-builder --win --publish always` → compila el instalador NSIS y **sube**
+   a una GitHub Release el `.exe` + su `.blockmap` + `latest.yml`.
 
-> El paso del tag es necesario: con `releaseType: release`, GitHub rechaza con un
-> **422 ("Published releases must have a valid tag")** crear la release si el tag no
-> existe de antemano (deja la subida a medias). Por eso `tag-release.js` lo empuja
-> antes.
+> El tag se empuja antes a propósito: con `releaseType: release`, GitHub devuelve un
+> **422 ("Published releases must have a valid tag")** si el tag no existe de antemano,
+> y la subida queda a medias. `release.js` lo evita.
 
 Los equipos con Station detectan la versión al comprobar actualización (botón
 «Buscar»), cada 6 h o al reabrir la app, y la instalan al cerrar.
