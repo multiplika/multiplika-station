@@ -4,13 +4,12 @@ _Última actualización: 2026-11-05_
 
 | Código | Tarea | Estado | Notas |
 |--------|-------|--------|-------|
-| MST-02 | Desarrollar actualizaciones automáticas | En progreso | Código listo (electron-updater + GitHub Releases, como el cliente de Support; ver `docs/07-autoactualizacion.md`). Falta crear el repo público de releases, fijar owner/repo en `package.json`, `npm install` y publicar con GH_TOKEN |
 | MST-06 | Añadir entradas de blog en la web multiplika.es | Pendiente | Publicar nuevas entradas de blog en la web |
 
 ---
 
 <details>
-<summary>Finalizadas (12)</summary>
+<summary>Finalizadas (13)</summary>
 
 | Código | Tarea |
 |--------|-------|
@@ -24,5 +23,6 @@ _Última actualización: 2026-11-05_
 | MST-10 | Mostrar favicon en las pestañas |
 | MST-11 | Elegir qué aplicaciones se muestran en el Panel de control (interruptor en Configuración → Aplicaciones) |
 | MST-12 | Soporte: botón "Escribir correo" (mailto) y botón de WhatsApp con logo oficial y color verde |
+| MST-02 | Actualizaciones automáticas (electron-updater + GitHub Releases, modelo del cliente de Support). 1.ª release publicada: v1.0.4. Ver `docs/07-autoactualizacion.md` |
 
 </details>
