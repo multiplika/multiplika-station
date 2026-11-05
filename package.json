@@ -15,7 +15,7 @@
     "dist:mac": "electron-builder --mac",
     "dist:win": "electron-builder --win",
     "dist:linux": "electron-builder --linux",
-    "publish:win": "node scripts/release.js && electron-builder --win --publish always"
+    "publish:win": "node scripts/release.js && electron-builder --win && node scripts/upload-release.js"
   },
   "dependencies": {
     "selfsigned": "^2.4.1",

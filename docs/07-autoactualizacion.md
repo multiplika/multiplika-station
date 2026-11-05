@@ -32,19 +32,21 @@ Para publicar una versión nueva:
 
 ```bash
 npm run version:set -- 1.0.5     # sube version.json (versión + fecha) y package.json
-set GH_TOKEN=<token>             # token con permiso 'repo' sobre multiplika/multiplika-station
-npm run publish:win
+npm run publish:win              # con `gh` autenticado en la cuenta "multiplika"
 ```
 
 `publish:win` encadena:
 1. `scripts/release.js` → commitea y empuja `version.json` + `package.json` y crea y
    empuja el tag `v<versión>` (aborta si esa versión ya se publicó).
-2. `electron-builder --win --publish always` → compila el instalador NSIS y **sube**
-   a una GitHub Release el `.exe` + su `.blockmap` + `latest.yml`.
+2. `electron-builder --win` → compila el instalador NSIS y genera `latest.yml` + el
+   `.blockmap` en `dist/` (sin publicar).
+3. `scripts/upload-release.js` → crea la GitHub Release (si no existe) y sube con `gh`
+   el `.exe` + `.blockmap` + `latest.yml`, con los nombres que espera electron-updater.
 
-> El tag se empuja antes a propósito: con `releaseType: release`, GitHub devuelve un
-> **422 ("Published releases must have a valid tag")** si el tag no existe de antemano,
-> y la subida queda a medias. `release.js` lo evita.
+> No usamos el publicador propio de electron-builder: en esta versión crea la release en
+> paralelo y colisiona (422 "valid tag" / "already_exists"), subiendo el `.exe` pero
+> dejándose `latest.yml`. Subir con `gh` es determinista. `upload-release.js` usa la
+> sesión de `gh` (cuenta activa), no necesita `GH_TOKEN`.
 
 Los equipos con Station detectan la versión al comprobar actualización (botón
 «Buscar»), cada 6 h o al reabrir la app, y la instalan al cerrar.
