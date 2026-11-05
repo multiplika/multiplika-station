@@ -23,26 +23,22 @@ de Multiplika Support.
 
 ## Versionado y publicación
 
-Las versiones van **por fecha**: `AAAA.MMDD.HHmm` (p. ej. `2026.1105.2015` = 2026-11-05
-20:15), así se sabe de un vistazo **cuándo se generó** la actualización. Llevan puntos
-porque electron-updater/electron-builder exigen **semver** (tres números) para comparar
-versiones; un número plano `AAAAMMDDHHmm` no serviría para decidir si hay que actualizar.
-Los componentes son enteros (`mes*100+día` y `hora*100+min`) para que sea semver válido
-y crezca en orden cronológico. `version.json.date` guarda además la marca legible
-`AAAAMMDD HH:MM`.
+Las versiones son **semver normal** (`1.0.4`, `1.0.5`…). En cada publicación se sella
+además la **fecha y hora** (`version.json.date`, formato `AAAAMMDD HH:MM`), y la app la
+muestra **junto a la versión** en Configuración → Actualizaciones (p. ej.
+`1.0.5 · 20261105 19:20`), para saber cuándo se generó cada actualización.
 
-Para publicar (no hay que inventar número: se sella la fecha/hora actual):
+Para publicar una versión nueva:
 
 ```bash
-npm install                      # solo la 1.ª vez (electron-updater)
+npm run version:set -- 1.0.5     # sube version.json (versión + fecha) y package.json
 set GH_TOKEN=<token>             # token con permiso 'repo' sobre multiplika/multiplika-station
 npm run publish:win
 ```
 
 `publish:win` encadena:
-1. `scripts/release.js` → genera la versión por fecha (`bump-version.js auto`),
-   commitea y empuja `version.json` + `package.json`, y crea y empuja el tag
-   `v<versión>` (aborta si esa versión ya se publicó).
+1. `scripts/release.js` → commitea y empuja `version.json` + `package.json` y crea y
+   empuja el tag `v<versión>` (aborta si esa versión ya se publicó).
 2. `electron-builder --win --publish always` → compila el instalador NSIS y **sube**
    a una GitHub Release el `.exe` + su `.blockmap` + `latest.yml`.
 

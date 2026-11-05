@@ -152,9 +152,12 @@ async function init() {
   // Versión de la app (sección Actualizaciones).
   try {
     const vi = await window.settingsApi.getVersion();
-    if (vi && vi.version) document.getElementById('versionValue').textContent = vi.version;
-    if (vi && vi.date) document.getElementById('versionDate').textContent = vi.date;
-  } catch (_) { /* se quedan los guiones */ }
+    if (vi && vi.version) {
+      // Mostrar la versión y, junto a ella, la fecha en que se generó.
+      document.getElementById('versionValue').textContent =
+        vi.date ? (vi.version + '  ·  ' + vi.date) : vi.version;
+    }
+  } catch (_) { /* se queda el guion */ }
 
   let printers = [];
   try { printers = await window.settingsApi.listPrinters(); } catch (_) { printers = []; }
