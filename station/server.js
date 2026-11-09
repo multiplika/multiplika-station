@@ -445,8 +445,9 @@ async function aeatDescargar(res, req, ctx, body) {
   const modelos = Array.isArray(body?.modelos) ? body.modelos.join(',') : String(body?.modelos || '').trim();
   const ejercicios = String(body?.ejercicios || '').trim();
   const periodos = String(body?.periodos || '').trim();
-  if (!nif || !modelos || !ejercicios) {
-    return sendError(res, req, 400, 'CUERPO_INVALIDO', 'Faltan nif, modelos o ejercicios');
+  // El ejercicio es opcional: si no viene, el descargador baja "el último presentado" de cada modelo.
+  if (!nif || !modelos) {
+    return sendError(res, req, 400, 'CUERPO_INVALIDO', 'Faltan nif o modelos');
   }
   try {
     // 1) Encola el trabajo en el descargador.
