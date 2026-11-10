@@ -4,6 +4,9 @@ node_modules/
 # Salida de compilación (instaladores, win-unpacked, latest.yml, blockmaps…)
 dist/
 
+# Descargador de modelos compilado (scripts/build-descargador.js); se genera al empaquetar
+vendor/
+
 # Configuración local de herramientas
 .claude/
 

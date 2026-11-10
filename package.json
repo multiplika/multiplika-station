@@ -13,9 +13,10 @@
     "version:set": "node scripts/bump-version.js",
     "dist": "electron-builder",
     "dist:mac": "electron-builder --mac",
-    "dist:win": "electron-builder --win",
+    "dist:win": "node scripts/build-descargador.js && electron-builder --win",
     "dist:linux": "electron-builder --linux",
-    "publish:win": "node scripts/release.js && electron-builder --win && node scripts/upload-release.js"
+    "build:descargador": "node scripts/build-descargador.js",
+    "publish:win": "node scripts/build-descargador.js && node scripts/release.js && electron-builder --win && node scripts/upload-release.js"
   },
   "dependencies": {
     "selfsigned": "^2.4.1",
@@ -59,12 +60,19 @@
     "win": {
       "target": [
         "nsis"
+      ],
+      "extraResources": [
+        {
+          "from": "vendor/descargador",
+          "to": "descargador"
+        }
       ]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true
+      "createDesktopShortcut": true,
+      "include": "build/installer.nsh"
     },
     "linux": {
       "target": [

@@ -4,6 +4,7 @@ const os = require('os');
 const store = require('./settings-store');
 const creds = require('./credentials-store');
 const { startStationServer } = require('./station/server'); // API local (puente con LEIA)
+const { crearDescargador } = require('./station/descargador'); // descargador de modelos AEAT (.NET)
 
 // Versión de la app (MST-05): version.json es la fuente de la verdad
 // (formato libre + fecha de actualización en AAAAMMDD HH:MM).
@@ -32,6 +33,16 @@ let mainWindow = null;
 // API local de la Station: { port, token, baseUrl, workRoot, close }. La arranca
 // app.whenReady(); el puente __MULTIPLIKA_STATION__ se entrega a las pestañas de LEIA.
 let stationApi = null;
+
+// Descargador de modelos AEAT que Station lleva dentro (resources/descargador). Lo
+// enciende al arrancar y lo apaga al cerrarse; sus datos y PDFs van a
+// ~/.multiplika/descargador (fuera de la instalación, que cada actualización reemplaza).
+const descargador = crearDescargador({
+  exe: app.isPackaged
+    ? path.join(process.resourcesPath, 'descargador', 'DescargadorModelos.exe')
+    : path.join(__dirname, 'vendor', 'descargador', 'DescargadorModelos.exe'),
+  carpeta: path.join(os.homedir(), '.multiplika', 'descargador'),
+});
 
 // Estado de las pestañas.
 const tabs = new Map();      // id -> WebContentsView
@@ -908,8 +919,11 @@ ipcMain.handle('update:check', async () => {
   try { await autoUpdater.checkForUpdates(); return { ok: true }; }
   catch (e) { setUpdateState('error', { msg: (e && e.message) || String(e) }); return { ok: false, msg: (e && e.message) || String(e) }; }
 });
-ipcMain.handle('update:install', () => {
+ipcMain.handle('update:install', async () => {
   if (autoUpdater && updateState.estado === 'listo') {
+    // Antes de instalar, apagar el descargador: si siguiera en marcha, el instalador no
+    // podría reemplazar sus ficheros y la actualización fallaría.
+    await descargador.apagar().catch(() => {});
     setImmediate(() => { try { autoUpdater.quitAndInstall(true, true); } catch (_) {} });
     return { ok: true };
   }
@@ -927,11 +941,18 @@ app.whenReady().then(async () => {
       version: versionInfo.version || '',
       equipo: os.hostname(),
       workRoot: path.join(os.homedir(), '.multiplika'),
-      elegirCarpeta: elegirCarpetaTrabajo
+      elegirCarpeta: elegirCarpetaTrabajo,
+      asegurarDescargador: () => descargador.asegurar()
     });
   } catch (e) {
     console.error('[station] la API local no arrancó:', (e && e.message) || e);
   }
+
+  // Enciende el descargador de modelos ya al arrancar (sin esperar), para que la primera
+  // descarga no pague el arranque. Si falla, se reintenta al pedir una descarga.
+  descargador.asegurar().then((r) => {
+    if (!r.ok) console.warn('[descargador]', r.motivo);
+  });
 
   // El servidor local usa un certificado autofirmado: LEIA (https) lo consume por
   // fetch, así que hay que aceptar el cert SOLO para su host:puerto (loopback).
@@ -991,4 +1012,16 @@ app.whenReady().then(async () => {
 app.on('window-all-closed', () => {
   try { if (stationApi) stationApi.close(); } catch (_) { /* ignore */ }
   if (process.platform !== 'darwin') app.quit();
+});
+
+// Al salir, apagar el descargador que encendió Station (Windows no cierra los procesos
+// hijos con el padre). Se retiene la salida hasta que termine (máx. ~4 s) y se reanuda.
+let descargadorApagado = false;
+app.on('before-quit', (event) => {
+  if (descargadorApagado || !descargador.propio) return;
+  event.preventDefault();
+  descargador.apagar().catch(() => {}).finally(() => {
+    descargadorApagado = true;
+    app.quit();
+  });
 });

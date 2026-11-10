@@ -41,7 +41,10 @@ function startStationServer(opts) {
     workRoot: path.resolve((opts && opts.workRoot) || '.'),
     token: crypto.randomBytes(32).toString('hex'),
     // Callback (lo pone main.js) para abrir el diálogo nativo de carpeta.
-    elegirCarpeta: (opts && opts.elegirCarpeta) || null
+    elegirCarpeta: (opts && opts.elegirCarpeta) || null,
+    // Callback (lo pone main.js) que enciende el descargador de modelos si no está en marcha.
+    // Devuelve { ok, motivo? }. Sin él, se asume que alguien lo ha arrancado a mano.
+    asegurarDescargador: (opts && opts.asegurarDescargador) || null
   };
 
   return new Promise((resolve, reject) => {
@@ -429,6 +432,7 @@ async function fsLeer(res, req, ctx, u) {
 //  El .NET es una cola asíncrona: se encola el trabajo, se sondea hasta que termina y se
 //  devuelven los PDF en base64 para que la pantalla de LEIA los adjunte a la respuesta.
 //  La URL del descargador es configurable con DESCARGADOR_URL (por defecto 127.0.0.1:5178).
+//  Station lo lleva dentro y lo enciende ella misma (station/descargador.js).
 // ---------------------------------------------------------------------------
 const DESCARGADOR_URL = (process.env.DESCARGADOR_URL || 'http://127.0.0.1:5178').replace(/\/+$/, '');
 const AEAT_TIMEOUT_MS = 180000; // la AEAT es lenta; damos hasta 3 minutos
@@ -448,6 +452,11 @@ async function aeatDescargar(res, req, ctx, body) {
   // El ejercicio es opcional: si no viene, el descargador baja "el último presentado" de cada modelo.
   if (!nif || !modelos) {
     return sendError(res, req, 400, 'CUERPO_INVALIDO', 'Faltan nif o modelos');
+  }
+  // Station lleva el descargador dentro: si no está encendido (o se ha caído), lo enciende.
+  if (ctx.asegurarDescargador) {
+    const est = await ctx.asegurarDescargador();
+    if (!est.ok) return sendError(res, req, 503, 'DESCARGADOR_NO_DISPONIBLE', est.motivo);
   }
   try {
     // 1) Encola el trabajo en el descargador.
