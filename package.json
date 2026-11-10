@@ -1,6 +1,6 @@
 {
   "name": "multiplika-webview",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Webview multiplataforma (Mac, Windows, Linux) que carga una única URL.",
   "main": "main.js",
   "author": "Multiplika",
