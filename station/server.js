@@ -449,6 +449,10 @@ async function aeatDescargar(res, req, ctx, body) {
   const modelos = Array.isArray(body?.modelos) ? body.modelos.join(',') : String(body?.modelos || '').trim();
   const ejercicios = String(body?.ejercicios || '').trim();
   const periodos = String(body?.periodos || '').trim();
+  // Colaborador social (opcional): consultar `nif` con el certificado de `nif_certificado` (el del
+  // despacho). `nombre` da nombre a la carpeta de descargas, porque ese NIF no tiene certificado aquí.
+  const nifCertificado = String(body?.nif_certificado || '').trim();
+  const nombre = String(body?.nombre || '').trim();
   // El ejercicio es opcional: si no viene, el descargador baja "el último presentado" de cada modelo.
   if (!nif || !modelos) {
     return sendError(res, req, 400, 'CUERPO_INVALIDO', 'Faltan nif o modelos');
@@ -463,7 +467,10 @@ async function aeatDescargar(res, req, ctx, body) {
     const alta = await fetch(DESCARGADOR_URL + '/api/trabajos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Descargador': '1' },
-      body: JSON.stringify({ Nif: nif, Modelos: modelos, Ejercicios: ejercicios, Periodos: periodos }),
+      body: JSON.stringify({
+        Nif: nif, Modelos: modelos, Ejercicios: ejercicios, Periodos: periodos,
+        NifCertificado: nifCertificado || null, Empresa: nombre || null,
+      }),
     });
     if (!alta.ok) {
       const t = await alta.text().catch(() => '');
